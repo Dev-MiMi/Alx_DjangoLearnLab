@@ -24,3 +24,12 @@ lib = Library.objects.get(name=library_name)
 
 for book in lib.books.all():
     print(book.name)
+
+
+# Query all books by a specific author
+author_name = "Chinua Achebe"
+author = Author.objects.get(name=author_name)
+
+books = Book.objects.filter(author=author)
+for book in books:
+    print(book.name)
