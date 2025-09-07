@@ -18,4 +18,9 @@ lib2.books.add(book1, book2)
 librarian1 = Librarian.objects.create(name="Mary Johnson", library=lib1)
 librarian2 = Librarian.objects.create(name="Samuel John", library=lib2)
 
-lib = Library.objects.get(name="City Library")
+# List all books in a library
+library_name = "City Library"
+lib = Library.objects.get(name=library_name) 
+
+for book in lib.books.all():
+    print(book.name)
