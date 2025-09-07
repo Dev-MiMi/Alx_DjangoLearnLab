@@ -33,3 +33,10 @@ author = Author.objects.get(name=author_name)
 books = Book.objects.filter(author=author)
 for book in books:
     print(book.name)
+
+# Retrieve the librarian for a library
+library_name = "City Library"
+library = Library.objects.get(name=library_name)
+
+librarian = Librarian.objects.get(library=library)
+print(librarian.name)
