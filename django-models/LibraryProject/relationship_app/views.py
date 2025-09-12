@@ -4,8 +4,8 @@ from .models import Library
 from django.views.generic.detail import DetailView
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.decorators import user_p
-asses_test
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import user_passes_test
 # Create your views 
 
 def list_books(request):
