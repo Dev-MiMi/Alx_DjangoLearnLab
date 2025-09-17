@@ -124,3 +124,24 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # Use the custom user model instead of Django's default
 AUTH_USER_MODEL = "bookshelf.CustomUser"
+
+# ✅ Redirect all HTTP traffic to HTTPS
+SECURE_SSL_REDIRECT = True  
+
+# ✅ Set HSTS (HTTP Strict Transport Security) to 1 year
+SECURE_HSTS_SECONDS = 31536000  
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True  
+SECURE_HSTS_PRELOAD = True  
+
+# ✅ Use secure cookies
+SESSION_COOKIE_SECURE = True  
+CSRF_COOKIE_SECURE = True  
+
+# ✅ Prevent browser from guessing content type
+SECURE_CONTENT_TYPE_NOSNIFF = True  
+
+# ✅ Enable XSS protection
+SECURE_BROWSER_XSS_FILTER = True  
+
+# ✅ Referrer Policy (optional, but recommended)
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
