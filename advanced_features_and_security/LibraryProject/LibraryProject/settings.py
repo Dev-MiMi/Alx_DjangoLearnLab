@@ -145,3 +145,6 @@ SECURE_BROWSER_XSS_FILTER = True
 
 # ✅ Referrer Policy (optional, but recommended)
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
+# ✅ Trust the X-Forwarded-Proto header set by your proxy
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
