@@ -19,7 +19,7 @@ librarian1 = Librarian.objects.create(name="Mary Johnson", library=lib1)
 
 # List all books in a library
 library_name = "City Library"
-lib = Library.objects.get(name=library_name) 
+lib = Library.objects.get(name=library_name)
 
 for book in lib.books.all():
     print(book.title)
