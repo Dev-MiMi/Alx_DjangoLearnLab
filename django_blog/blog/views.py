@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from .models import Post
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 # Create your views here.
 
@@ -57,6 +58,7 @@ class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
     context_object_name = "posts"
+    ordering = ["-date_posted"]
 
 class PostDetailView(DetailView):
     model = Post
@@ -64,21 +66,33 @@ class PostDetailView(DetailView):
     context_object_name = "post"
 
 # Create a new post (CREATE)
-class PostCreateView(CreateView):
+class PostCreateView(LoginRequiredMix, CreateView):
     model = Post
     template_name = "blog/post_form.html"
     fields = ["title", "content"]
     success_url = reverse_lazy("post_list")
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
 
-# Update an existing post (UPDATE)
-class PostUpdateView(UpdateView):
+class PostUpdateView(LoginRequiredMix, UpdateView):
     model = Post
     template_name = "blog/post_form.html"
     fields = ["title", "content"]
     success_url = reverse_lazy("post_list")
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
 
 # Delete a post (DELETE)
-class PostDeleteView(DeleteView):
+class PostDeleteView(LoginRequiredMix, DeleteView):
     model = Post
     template_name = "blog/post_confirm_delete.html"
     success_url = reverse_lazy("post_list")
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
