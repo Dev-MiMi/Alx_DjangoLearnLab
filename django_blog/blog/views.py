@@ -1,13 +1,13 @@
-from django.shortcuts import render,
-redirect
-from django.views import view
+from django.shortcuts import render, redirect
+from django.views import View
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
-from .forms import CustomUserCreationFormfrom django.contrib import messages
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
+from .forms import CustomUserCreationForm
+from django.contrib import messages
 from django.contrib.auth.models import User
-from django.utils.decorators import metho
-d_decorator
+from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from .models import Post
 
 # Create your views here.
 
@@ -52,3 +52,33 @@ class ProfileView(View):
         user.save()
         messages.success(request, 'Profile updated successfully!')
         return redirect('profile')
+
+class PostListView(ListView):
+    model = Post
+    template_name = "blog/post_list.html"
+    context_object_name = "posts"
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "blog/post_detail.html"
+    context_object_name = "post"
+
+# Create a new post (CREATE)
+class PostCreateView(CreateView):
+    model = Post
+    template_name = "blog/post_form.html"
+    fields = ["title", "content"]
+    success_url = reverse_lazy("post_list")
+
+# Update an existing post (UPDATE)
+class PostUpdateView(UpdateView):
+    model = Post
+    template_name = "blog/post_form.html"
+    fields = ["title", "content"]
+    success_url = reverse_lazy("post_list")
+
+# Delete a post (DELETE)
+class PostDeleteView(DeleteView):
+    model = Post
+    template_name = "blog/post_confirm_delete.html"
+    success_url = reverse_lazy("post_list")
