@@ -19,3 +19,12 @@
 ## Testing
 - Check that unauthorized users are redirected to login
 - Ensure users can only edit or delete their own posts
+
+### Comments
+- Users can create, edit, and delete comments on posts.
+- Only authenticated users can create comments.
+- Only the comment author may edit or delete their own comment.
+- Comment URLs:
+  - Create: /post/<post_pk>/comments/new/
+  - Edit:   /post/<post_pk>/comments/<pk>/edit/
+  - Delete: /post/<post_pk>/comments/<pk>/delete/
