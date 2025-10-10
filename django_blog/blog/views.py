@@ -1,24 +1,23 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import (
-    CreateView, ListView, DetailView, UpdateView, DeleteView
-)
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, DetailView, UpdateView, DeleteView
 from django.contrib import messages
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.models import User
 
-from .models import Post
-from .forms import CustomUserCreationForm
+from .models import Post, Comment
+from .forms import CustomUserCreationForm, CommentForm
 
 
-# ---------- HOME VIEW ----------
+# Home view
 def home_view(request):
     return render(request, 'blog/home.html')
 
 
-# ---------- USER REGISTRATION ----------
+# Register View
 class RegisterView(View):
     template_name = 'blog/register.html'
 
@@ -35,35 +34,31 @@ class RegisterView(View):
         return render(request, self.template_name, {'form': form})
 
 
-# ---------- USER PROFILE ----------
+# Profile View
 @method_decorator(login_required, name='dispatch')
 class ProfileView(View):
     template_name = 'blog/profile.html'
 
     def get(self, request):
-        """Display user profile details"""
         return render(request, self.template_name, {'user': request.user})
 
     def post(self, request):
-        """Handle profile updates"""
         user = request.user
         username = request.POST.get('username')
         email = request.POST.get('email')
 
-        # Update fields only if provided
         if username:
             user.username = username
         if email:
             user.email = email
 
         user.save()
-        messages.success(request, "Profile updated successfully!")
+        messages.success(request, 'Profile updated successfully!')
         return redirect('profile')
 
 
-# ---------- BLOG POST CRUD VIEWS ----------
+# ===== POST CRUD =====
 
-# List all posts (READ - list)
 class PostListView(ListView):
     model = Post
     template_name = "blog/post_list.html"
@@ -71,14 +66,12 @@ class PostListView(ListView):
     ordering = ["-date_posted"]
 
 
-# View single post (READ - detail)
 class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post_detail.html"
     context_object_name = "post"
 
 
-# Create a new post (CREATE)
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = "blog/post_form.html"
@@ -90,7 +83,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-# Update a post (UPDATE)
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
     template_name = "blog/post_form.html"
@@ -102,18 +94,61 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return super().form_valid(form)
 
     def test_func(self):
-        """Allow only post author to update"""
         post = self.get_object()
         return self.request.user == post.author
 
 
-# Delete a post (DELETE)
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     template_name = "blog/post_confirm_delete.html"
     success_url = reverse_lazy("post_list")
 
     def test_func(self):
-        """Allow only post author to delete"""
         post = self.get_object()
         return self.request.user == post.author
+
+
+# ===== COMMENT CRUD =====
+
+class CommentCreateView(LoginRequiredMixin, CreateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.instance.post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        messages.success(self.request, "Comment added successfully!")
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={'pk': self.kwargs['post_id']})
+
+
+class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+    template_name = "blog/comment_form.html"
+
+    def form_valid(self, form):
+        messages.success(self.request, "Comment updated successfully!")
+        return super().form_valid(form)
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={'pk': self.object.post.pk})
+
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = "blog/comment_confirm_delete.html"
+
+    def test_func(self):
+        comment = self.get_object()
+        return self.request.user == comment.author
+
+    def get_success_url(self):
+        return reverse_lazy("post_detail", kwargs={'pk': self.object.post.pk})

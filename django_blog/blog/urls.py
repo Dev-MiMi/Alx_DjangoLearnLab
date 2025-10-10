@@ -9,13 +9,16 @@ from .views import (
     PostCreateView,
     PostUpdateView,
     PostDeleteView,
+    CommentCreateView,
+    CommentUpdateView,
+    CommentDeleteView,
 )
 
 urlpatterns = [
     path("", home_view, name="home"),
     path("register/", RegisterView.as_view(), name="register"),
     path("profile/", ProfileView.as_view(), name="profile"),
-    
+
     # Auth
     path("login/", auth_view.LoginView.as_view(template_name="blog/login.html"), name="login"),
     path("logout/", auth_view.LogoutView.as_view(), name="logout"),
@@ -26,4 +29,9 @@ urlpatterns = [
     path("post/new/", PostCreateView.as_view(), name="post_create"),
     path("post/<int:pk>/update/", PostUpdateView.as_view(), name="post_update"),
     path("post/<int:pk>/delete/", PostDeleteView.as_view(), name="post_delete"),
+
+    # Comment CRUD
+    path("posts/<int:post_id>/comments/new/", CommentCreateView.as_view(), name="comment_create"),
+    path("comments/<int:pk>/edit/", CommentUpdateView.as_view(), name="comment_update"),
+    path("comments/<int:pk>/delete/", CommentDeleteView.as_view(), name="comment_delete"),
 ]
