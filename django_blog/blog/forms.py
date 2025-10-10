@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django import forms
 from .models import Comment, Post, Tag
 
+
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = User
@@ -13,11 +14,14 @@ class CustomUserCreationForm(UserCreationForm):
             "password2",
         )
 
+
 class CommentForm(forms.ModelForm):
     content = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": 3, "placeholder": "Write your comment..."}),
+        widget=forms.Textarea(
+            attrs={"rows": 3, "placeholder": "Write your comment..."}
+        ),
         max_length=2000,
-        label=""
+        label="",
     )
 
     class Meta:
@@ -32,12 +36,16 @@ class CommentForm(forms.ModelForm):
             raise forms.ValidationError("Comment is too short.")
         return data
 
+
 class PostForm(forms.ModelForm):
     tags = forms.CharField(required=False, help_text="Add tags separated by commas")
 
     class Meta:
         model = Post
         fields = ["title", "content", "tags"]
+        widgets = {
+            "tags": TagWidget(),
+        }
 
     def save(self, commit=True):
         instance = super().save(commit=False)
